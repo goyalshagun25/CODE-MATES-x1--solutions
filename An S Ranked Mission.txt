@@ -1,0 +1,103 @@
+#include <bits/stdc++.h>
+#include <chrono> 
+using namespace std::chrono; 
+using namespace std;
+#define int long long
+#define mxn 1000005
+int phi[mxn];
+vector<int> pr;
+signed main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(0);
+    int i, j;
+    for(i=1;i<mxn;i++)
+        phi[i] = i;
+    for(i=2;i<mxn;i++)
+        if(phi[i] == i)
+        {
+            pr.push_back(i);
+            for(j=i;j<mxn;j+=i)
+                phi[j] = i;
+        }
+    //cout << "hello" << endl;
+    //cout << pr.size() << '\n';
+    int t;
+    cin >> t;
+    while(t--)
+    {
+        int x, y;
+        cin >> x >> y;
+        int vis[y-x+1] = {0}, factor[y-x+1];
+        //cout << "hello" << endl;
+        //cout << "hello" << endl;
+        for(i=0;i<=y-x;i++)
+            vis[i] = i + x, factor[i] = 1;
+        
+        auto start = high_resolution_clock::now(); 
+        for(auto ele : pr)
+        {
+            int s = ((x + ele - 1)/ele)*ele;
+            if(s > y)
+                continue;
+            while(s <= y)
+            {
+                int num = vis[s-x];
+                int cnt = 0;
+                while(num%ele == 0)
+                    num = num/ele, cnt++;
+                vis[s-x] = num;
+                factor[s-x] = factor[s-x]*(1+cnt);
+                s+=ele;
+            }
+        }
+        auto stop = high_resolution_clock::now(); 
+        auto duration = duration_cast<microseconds>(stop - start); 
+  
+        //cout << duration.count() << endl; 
+                
+        for(i=0;i<=y-x;i++)
+            if(vis[i] > 1)
+                factor[i] = 2*factor[i];
+
+        int maxa = 0, mina = 1e9;
+        for(i=0;i<=y-x;i++)
+            maxa = max(maxa, factor[i]), mina = min(mina, factor[i]);
+        int cmin = mina, smin = 0;
+        for(i=0;i<=y-x;i++)
+            if(factor[i] == cmin)
+                smin+=(i+x);
+        int cmax = maxa, smax = 0;
+        for(i=0;i<=y-x;i++)
+            if(factor[i] == cmax)
+                smax+=(i+x);
+        int csum = 0, sprime = 0;
+        for(i=0;i<=y-x;i++)
+            if(factor[i] != mina && factor[i] != maxa)
+                csum+=factor[i], sprime+=(i+x);
+        int f = cmin%26;
+        char f1;
+        if(f%2 == 0)
+            f1 = ('A' + f);
+        else
+            f1 = ('a' + f);
+            
+        int m = csum%26;
+        char m1;
+        if(m%2 == 0)
+            m1 = ('A' + m);
+        else
+            m1 = ('a' + m);
+            
+        int l = cmax%26;
+        char l1;
+        if(l%2 == 0)
+            l1 = ('A' + l);
+        else
+            l1 = ('a' + l);
+        string ans = f1 + to_string(smin) + m1 + to_string(smax) + l1;
+        //cout << ans << '\n';
+        if(sprime%2 == 1)
+            reverse(ans.begin(), ans.end());
+        cout << ans << '\n';
+    }
+}
