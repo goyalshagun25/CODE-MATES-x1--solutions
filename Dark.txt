@@ -1,0 +1,101 @@
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+ 
+using namespace __gnu_pbds;
+using namespace std;
+ 
+typedef long long int ll;
+typedef unsigned long long int sll;
+typedef long double ld;
+#define A 1000000007ll
+#define D 100000000000000ll
+#define B 998244353ll
+#define C 1000000000000000000ll
+#define M 4000
+#define FAST ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+#define oset tree<pair<ll,ll>, null_type,greater<pair<ll,ll>>, rb_tree_tag,tree_order_statistics_node_update> 
+#define pb push_back
+#define pf push_front
+#define pob pop_back
+#define pof pop_front
+#define mxe(v) *max_element(v.begin(),v.end())
+#define mne(v) *min_element(v.begin(),v.end())
+#define rev(v) reverse(v.begin(),v.end())
+#define sor(v) sort(v.begin(),v.end())
+#define uni(v) unique(v.begin(),v.end())
+#define bs binary_search
+#define lb(v,x) lower_bound(v.begin(),v.end(),x)
+#define ub(v,x) upper_bound(v.begin(),v.end(),x)
+#define ve vector
+#define br break
+#define PI acos(-1)
+#define subt cerr << "Time : " << 1000 * ((double)clock()) / (double)CLOCKS_PER_SEC << "ms\n" 
+
+const ll MAXN = 1000005;
+ll n, t[4*MAXN];
+
+void builds(ll a[], ll v, ll tl, ll tr) 
+{
+    if (tl == tr) 
+        t[v] = a[tl];
+    else 
+    {
+        ll tm = (tl + tr) / 2;
+        builds(a, v*2, tl, tm);
+        builds(a, v*2+1, tm+1, tr);
+        t[v] = t[v*2] + t[v*2+1];
+    }
+}
+
+ll sum(ll v, ll tl, ll tr, ll l, ll r) 
+{
+    if (l > r) 
+        return 0;
+    if (l == tl && r == tr) 
+        return t[v];
+    ll tm = (tl + tr) / 2;
+    return sum(v*2, tl, tm, l, min(r, tm)) + sum(v*2+1, tm+1, tr, max(l, tm+1), r);
+}
+
+void updates(ll v, ll tl, ll tr, ll pos, ll new_val) 
+{
+    if (tl == tr) 
+        t[v] = new_val;
+    else 
+    {
+        ll tm = (tl + tr) / 2;
+        if (pos <= tm)
+            updates(v*2, tl, tm, pos, new_val);
+        else
+            updates(v*2+1, tm+1, tr, pos, new_val);
+        t[v] = t[v*2] + t[v*2+1];
+    }
+}
+
+int main() 
+{
+    FAST;
+    ll n,x,q;
+    cin>>n;
+    ll a[n];
+    for(int i=0;i<n;i++)
+        cin>>a[i];
+    builds(a,1,0,n-1);
+    cin>>q;
+    for(int i=0;i<q;i++)
+    {
+        string s;
+        cin>>s;
+        ll p,q;
+        cin>>p>>q;
+        if(s=="past")
+        {
+            a[q-1]+=p;
+            updates(1,0,n-1,q-1,a[q-1]);
+        }
+        else
+            cout<<sum(1,0,n-1,p-1,q-1)<<'\n';
+    }
+    subt;
+    return 0;
+}
